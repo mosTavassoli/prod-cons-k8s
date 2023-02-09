@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ms-producer
+  name: ms-consumer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ms-producer
+      app: ms-consumer
   template:
    metadata:
       labels:
-        app: ms-producer
+        app: ms-consumer
    spec:
       containers:
-      - name: ms-producer
-        image: mostafa2020/producer:v31
+      - name: ms-consumer
+        image: mostafa2020/consumer:v5
         command:
           - sh
           - -c
@@ -27,4 +27,4 @@ spec:
            curl -L --remote-name https://github.com/etcd-io/etcd/releases/download/v3.5.1/etcd-v3.5.1-linux-amd64.tar.gz
            tar xzvf etcd-v3.5.1-linux-amd64.tar.gz
            mv etcd-v3.5.1-linux-amd64/etcdctl /usr/local/bin/
-           ./bin/producer "10.254.2.190"
+           ./bin/consumer "10.254.2.190"

@@ -57,23 +57,27 @@ std::string defineCmd(int pod_idx /*=-1*/, bool rbac /*=false*/)
 
   else
     cmd = "etcdctl";
-    //cmd = "etcdctl --endpoints=10.254.2.87:2379";
+  // cmd = "etcdctl --endpoints=10.254.2.87:2379";
 
   return cmd;
 }
 
-unsigned int parseString (std::string s, std::string* output, std::string delimiter/*="\n"*/, bool stdoutEn/*=false*/) {
+unsigned int parseString(std::string s, std::string *output, std::string delimiter /*="\n"*/, bool stdoutEn /*=false*/)
+{
   size_t pos = 0;
   unsigned int rows = 0;
   std::string token;
-  while ((pos = s.find(delimiter)) != std::string::npos) {
-      token = s.substr(0, pos);
-      output[rows++] = token;
-      if(stdoutEn) std::cout << token << std::endl;
-      s.erase(0, pos + delimiter.length());
+  while ((pos = s.find(delimiter)) != std::string::npos)
+  {
+    token = s.substr(0, pos);
+    output[rows++] = token;
+    if (stdoutEn)
+      std::cout << token << std::endl;
+    s.erase(0, pos + delimiter.length());
   }
   output[rows++] = s;
-  if(stdoutEn) std::cout << s << std::endl;
+  if (stdoutEn)
+    std::cout << s << std::endl;
 
   return rows;
 }
@@ -105,30 +109,30 @@ KV etcdGet(std::string cmd, std::string key, bool serializable /*=false*/)
   }
   else
   {
-    //std::cout << "Get error! Output: " << output << " Size: " << rows << std::endl;
+    // std::cout << "Get error! Output: " << output << " Size: " << rows << std::endl;
     kv_t.key = "Error";
-   kv_t.value = "Error";
+    kv_t.value = "Error";
   }
 
   return kv_t;
 }
 
 bool etcdPut(std::string cmd, KV kv_t)
- {
-   // std::string cmd = defineCmd(); time consuming
-   std::string put_cmd = "put";
-   std::string output;
+{
+  // std::string cmd = defineCmd(); time consuming
+  std::string put_cmd = "put";
+  std::string output;
 
   output = callToSystem(cmd + " " + put_cmd + " " + kv_t.key + " " + kv_t.value);
-  //std::cout << "Command is " <<  output << std::endl; 
+  std::cout << "Command is " << output << std::endl;
   if (strcmp(output.c_str(), "OK\n") == 0)
-     return true;
-   else
-   {
-     std::cout << "Error putting key! Output: " << output << std::endl;
-     return false;
-   }
- }
+    return true;
+  else
+  {
+    std::cout << "Error putting key! Output: " << output << std::endl;
+    return false;
+  }
+}
 
 std::string randStr(const int len)
 {

@@ -6,30 +6,45 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-  std::string tokens[10];
   std::string arg1 = argv[1];
   unsigned int size = 0;
-  bool strong_consistency = true;
+  unsigned int keys = 0;
   KV get_kv;
-  
-  //std::string cmd = defineCmd(0);
-  std::cout << "THIS is the IP " << arg1 << std::endl;
-  // Put key test
+  unsigned int i = 0;
+  unsigned int max = std::numeric_limits<unsigned int>::max();
+  // std::string cmd = defineCmd(0);
   KV new_kv;
-  new_kv.key = "hello";
-  new_kv.value = "Hello_MOSI_JOON";
-	
+  new_kv.key = "key";
   std::string cmd;
-  cmd = "etcdctl --endpoints="+arg1+":2379";
-  
-  //std::cout << cmd << std::endl;
-   for (int i = 1; i <= 5; ++i)
+  cmd = "etcdctl --endpoints=" + arg1 + ":2379";
+
+  // std::cout << cmd << std::endl;
+
+  auto start = std::chrono::high_resolution_clock::now();
+  auto end = start + std::chrono::seconds(1);
+
+  while (true)
   {
-    new_kv.key = "hello" + std::to_string(i);
-    new_kv.value = "Hello_MOSI_JOON" + std::to_string(i);
+    new_kv.value = "key-" + std::to_string(i);
     etcdPut(cmd, new_kv);
+    if (std::chrono::high_resolution_clock::now() >= end)
+    {
+      keys = i;
+      break;
+    }
+    i++;
   }
-  //etcdPut(cmd, new_kv);
-  //sleep(50);
+
+  std::cout << "keys/sec: " << keys << std::endl;
+
+  while (true)
+  {
+    if (i == max)
+      i = 0;
+    new_kv.value = "key-" + std::to_string(i);
+    etcdPut(cmd, new_kv);
+    i++;
+  }
+
   return 0;
 }
