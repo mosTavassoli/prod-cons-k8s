@@ -6,19 +6,16 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-  std::string arg1 = argv[1];
   unsigned int size = 0;
   unsigned int keys = 0;
+  bool strong_consistency = true;
+  int pod_idx = std::stoi(argv[1]);
   KV get_kv;
-  unsigned int i = 0;
+  unsigned int i=0;
   unsigned int max = std::numeric_limits<unsigned int>::max();
-  // std::string cmd = defineCmd(0);
+  std::string cmd = defineCmd(pod_idx);
   KV new_kv;
   new_kv.key = "key";
-  std::string cmd;
-  cmd = "etcdctl --endpoints=" + arg1 + ":2379";
-
-  // std::cout << cmd << std::endl;
 
   auto start = std::chrono::high_resolution_clock::now();
   auto end = start + std::chrono::seconds(1);
@@ -27,17 +24,17 @@ int main(int argc, char *argv[])
   {
     new_kv.value = "key-" + std::to_string(i);
     etcdPut(cmd, new_kv);
-    if (std::chrono::high_resolution_clock::now() >= end)
+    i++;
+    if ( std::chrono::high_resolution_clock::now() >= end )
     {
       keys = i;
       break;
     }
-    i++;
   }
 
   std::cout << "keys/sec: " << keys << std::endl;
 
-  while (true)
+  while(true)
   {
     if (i == max)
       i = 0;
@@ -45,6 +42,5 @@ int main(int argc, char *argv[])
     etcdPut(cmd, new_kv);
     i++;
   }
-
   return 0;
 }

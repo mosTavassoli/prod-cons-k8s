@@ -21,7 +21,7 @@ std::string callToSystem(std::string cmd);
 
 std::string defineCmd(int pod_idx = -1, bool rbac = false);
 
-unsigned int parseString(std::string s, std::string *output, std::string delimiter = "\n", bool stdoutEn = false);
+unsigned int parseString (std::string s, std::string* output, std::string delimiter="\n", bool stdoutEn=false);
 
 KV etcdGet(std::string cmd, std::string key, bool serializable = false);
 

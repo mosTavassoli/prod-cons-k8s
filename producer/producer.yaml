@@ -14,17 +14,26 @@ spec:
    spec:
       containers:
       - name: ms-producer
-        image: mostafa2020/producer:v31
+        image: mostafa2020/producer:v1
         command:
           - sh
           - -c
           - |
-           apk add curl
-           export version=v1.26.1
-           curl -L --remote-name-all https://dl.k8s.io//bin/linux/amd64/{kubectl}
-           chmod +x kubectl
-           mv kubectl /usr/local/bin/
-           curl -L --remote-name https://github.com/etcd-io/etcd/releases/download/v3.5.1/etcd-v3.5.1-linux-amd64.tar.gz
-           tar xzvf etcd-v3.5.1-linux-amd64.tar.gz
-           mv etcd-v3.5.1-linux-amd64/etcdctl /usr/local/bin/
-           ./bin/producer "10.254.2.190"
+            ./bin/producer -1
+        volumeMounts:
+        - name: kubectl-config-volume
+          mountPath: /root/.kube
+          readOnly: true
+      volumes:
+      - name: kubectl-config-volume
+        secret:
+          secretName: kubectl-config 
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - worker-1

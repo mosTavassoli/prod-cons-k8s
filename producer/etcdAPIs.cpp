@@ -5,6 +5,7 @@ using namespace std;
 
 std::string callToSystem(std::string cmd)
 {
+  //std::cout << "inside callToSys" << cmd << endl;
   std::ostringstream output;
   FILE *fpipe;
   char c = 0;
@@ -38,11 +39,14 @@ std::string defineCmd(int pod_idx /*=-1*/, bool rbac /*=false*/)
     {
       std::string clusterIP = callToSystem("kubectl get svc my-etcd --template={{.spec.clusterIP}}");
       cmd = cmd_tmp1 + clusterIP + cmd_tmp2;
+      std::cout << cmd << std::endl;
     }
     else
     {
-      std::cout << "I am here " << std::endl;
+      //std::cout << "I am here " << std::endl;
+      //std::cout << pod_idx << std::endl;
       std::string podIP_cmd = "kubectl get pod my-etcd-" + std::to_string(pod_idx) + " --template={{.status.podIP}}";
+      std::cout << podIP_cmd << std::endl;
       std::string podIP = callToSystem(podIP_cmd);
       cmd = cmd_tmp1 + podIP + cmd_tmp2;
     }
@@ -50,8 +54,10 @@ std::string defineCmd(int pod_idx /*=-1*/, bool rbac /*=false*/)
     if (rbac)
     {
       std::string rootPwd = callToSystem("kubectl get secret --namespace default my-etcd -o jsonpath=\"{.data.etcd-root-password}\" | base64 -d");
+      std::cout << rootPwd << std::endl;
       std::string cmd_tmp3 = " --user root:";
       cmd = cmd + cmd_tmp3 + rootPwd;
+      std::cout << cmd << std::endl;
     }
   }
 
@@ -97,6 +103,7 @@ KV etcdGet(std::string cmd, std::string key, bool serializable /*=false*/)
 
   // executing command, getting output as string and parsing it
   output = callToSystem(cmd + " " + get_cmd + " " + key + " " + consistency_opt + " " + limit_opt);
+  std::cout << output << std::endl;
   rows = parseString(output, tokens);
   if (rows == 3)
   {
@@ -120,7 +127,7 @@ bool etcdPut(std::string cmd, KV kv_t)
    std::string output;
 
   output = callToSystem(cmd + " " + put_cmd + " " + kv_t.key + " " + kv_t.value);
-  //std::cout << "Command is " <<  output << std::endl; 
+  std::cout << output << std::endl;
   if (strcmp(output.c_str(), "OK\n") == 0)
      return true;
    else
