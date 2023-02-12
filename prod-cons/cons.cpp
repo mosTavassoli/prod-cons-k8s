@@ -31,10 +31,11 @@ int main(int argc, char *argv[])
     std::cerr << "Unable to open file" << std::endl;
     return 1;
   }
+  auto start = std::chrono::high_resolution_clock::now();
 
   for (int i = 0; i < 50; i++)
   {
-    auto start = std::chrono::high_resolution_clock::now();
+    start = std::chrono::high_resolution_clock::now();
     while (std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start).count() < 1.0)
     {
       get_kv = etcdGet(cmd, "key");
@@ -62,10 +63,8 @@ int main(int argc, char *argv[])
   outfile.close();
   // check if the application is finished
   std::cout << "cons-done" << std::endl;
-  
-  while (true){
-    get_kv = etcdGet(cmd, "key");
-  }
+
+  while (true){}
 
   return 0;
 }

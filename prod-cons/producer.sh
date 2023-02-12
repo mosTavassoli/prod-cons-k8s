@@ -29,7 +29,7 @@ spec:
    spec:
       containers:
       - name: ms-producer
-        image: mostafa2020/prod-cons:v24
+        image: mostafa2020/prod-cons:v25
         command:
           - sh
           - -c
@@ -48,15 +48,6 @@ spec:
       - name: data-volume
         persistentVolumeClaim:
           claimName: prod-pvc
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: In
-                values:
-                - worker-1
 EOF
 }
 
@@ -73,5 +64,5 @@ do
 done
 
 kubectl cp -n default  $pod_name:/app/logs ./logs
-sleep 10
+
 

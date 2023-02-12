@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
   unsigned int put_keys = 0;        // number of keys put in etcd
   float key_size_abs = 100;         // number of bytes per key
   int key_size = 0;                 // number of bytes per key normalized in [B]
-  // unsigned int max = std::numeric_limits<unsigned int>::max();
+  //unsigned int max = std::numeric_limits<unsigned int>::max();
 
   // Circular buffer variables
   float exp = 0; // value passed from cli
@@ -82,11 +82,6 @@ int main(int argc, char *argv[])
   // check if the application is finished
   std::cout << "prod-done" << std::endl;
 
-  while (true)
-  {
-    std::string rand_string = randStr(key_size);
-    new_kv.value = rand_string;
-    etcdPut(cmd, new_kv);
-  }
+  while (true){}
   return 0;
 }

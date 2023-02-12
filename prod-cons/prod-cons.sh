@@ -16,7 +16,7 @@ size=(5)
 key_size_int=$(echo $key_size | awk '{print int($1+0.5)}')
 num_peers=(6 2 1)
 
-tc_bool=0 #enable communication delay emulation
+tc_bool=1 #enable communication delay emulation
 #kubectl apply -f ./pvc.yaml
 
 for s in ${num_peers[@]}
@@ -25,10 +25,10 @@ kubectl apply -f ./prod-pvc.yaml
 kubectl apply -f ./cons-pvc.yaml
 if [ $tc_bool -eq 1 ]
 then
-  helm install my-etcd ./etcd8s-net/ --set replicaCount=$s
+  helm install my-etcd /home/crownlabs/etcd-k8s-experiment/etcd/etcd8s-net/ --set replicaCount=$s
   sleep 300
-  ./etcd8s-net/config-tc.sh #set delays
-  sleep 5
+  /home/crownlabs/etcd-k8s-experiment/etcd/etcd8s-net/config-tc.sh #set delays
+  sleep 10
 else
   helm install my-etcd /home/crownlabs/etcd-k8s-experiment/etcd/etcd8s  --set replicaCount=$s
   sleep 300
@@ -45,11 +45,20 @@ done
 kubectl delete deployment ms-producer
 kubectl delete deployment ms-consumer
 helm uninstall my-etcd
-sleep 10
+
+while true; do
+  pods=$(kubectl get pods --no-headers | awk '{print $3}')
+  if echo "$pods" | grep -q "Running" || echo "$pods" | grep -q "Terminating"; then
+    echo "Running pods found, no action needed."
+  else
+    echo "No running pods found, performing operation."
+    break
+  fi
+  sleep 50
+done
 
 kubectl delete pvc --all
 kubectl delete pv --all
-sleep 3
 
 if [ $tc_bool -eq 0 ]
 then
