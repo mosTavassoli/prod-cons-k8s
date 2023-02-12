@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-producer
+  template:
+   metadata:
+      labels:
+        app: ms-producer
+   spec:
+      containers:
+      - name: ms-producer
+        image: mostafa2020/prod-cons:v24
+        command:
+          - sh
+          - -c
+          - |
+            ./bin/producer 5 100
+        volumeMounts:
+        - name: kubectl-config-volume
+          mountPath: /root/.kube
+          readOnly: true
+        - name: data-volume
+          mountPath: /app/logs
+      volumes:
+      - name: kubectl-config-volume
+        secret:
+          secretName: kubectl-config
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: prod-pvc
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - worker-1

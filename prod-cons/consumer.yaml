@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-consumer
+  template:
+   metadata:
+      labels:
+        app: ms-consumer
+   spec:
+      containers:
+      - name: ms-consumer
+        image: mostafa2020/prod-cons:v24
+        command:
+          - sh
+          - -c
+          - |
+            ./bin/consumer
+        volumeMounts:
+        - name: kubectl-config-volume
+          mountPath: /root/.kube
+          readOnly: true
+        - name: data-volume
+          mountPath: /app/logs
+      volumes:
+      - name: kubectl-config-volume
+        secret:
+          secretName: kubectl-config
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: cons-pvc
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - worker-2
