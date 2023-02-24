@@ -183,7 +183,7 @@ KV etcdGet(std::string cmd, std::string key, bool serializable /*=false*/)
 
   // executing command, getting output as string and parsing it
   output = callToSystem(cmd + " " + get_cmd + " " + key + " " + consistency_opt + " " + limit_opt);
-  std::cout << output << std::endl;
+  //std::cout << output << std::endl;
   rows = parseString(output, tokens);
   if (rows == 3)
   {
@@ -207,7 +207,7 @@ bool etcdPut(std::string cmd, KV kv_t)
   std::string output;
 
   output = callToSystem(cmd + " " + put_cmd + " " + kv_t.key + " " + kv_t.value);
-  std::cout << "Command is " << output << std::endl;
+  //std::cout << "Command is " << output << std::endl;
   if (strcmp(output.c_str(), "OK\n") == 0)
     return true;
   else

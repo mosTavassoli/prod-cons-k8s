@@ -15,7 +15,10 @@ int main(int argc, char *argv[])
   float key_size_abs = 100;         // number of bytes per key
   int key_size = 0;                 // number of bytes per key normalized in [B]
   //unsigned int max = std::numeric_limits<unsigned int>::max();
-
+  std::string cmd = defineCmd(-1);
+  int leader_idx = -2;             // index of the replica acting as leader
+ // bool reqToLeader = false;         // make request directly to the leader
+  
   // Circular buffer variables
   float exp = 0; // value passed from cli
   float N = 0;   // buffer size in bytes
@@ -31,13 +34,17 @@ int main(int argc, char *argv[])
   N = pow(10, exp);
   key_size = key_size_abs * pow(10, 3); // normalized in [B]
 
+  // Find and change Raft leader
+  leader_idx = findLeader();
+  cmd = defineCmd(leader_idx);
+
+
   // Calculating number of keys
   int num_keys = (int)round(N / (float)key_size);
 
   // Initializing etcd client
   KV get_kv;
   int counter = 0;
-  std::string cmd = defineCmd(-1);
   KV new_kv;
   new_kv.key = "key";
 
@@ -54,14 +61,15 @@ int main(int argc, char *argv[])
     std::cerr << "Unable to open file" << std::endl;
     return 1;
   }
-
+  
+  auto start = std::chrono::high_resolution_clock::now();
   for (int i = 0; i < 50; i++)
   {
-    auto start = std::chrono::high_resolution_clock::now();
     std::string rand_string = randStr(key_size);
+    new_kv.value = rand_string;
+    start = std::chrono::high_resolution_clock::now();
     while (std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start).count() < 1.0)
     {
-      new_kv.value = rand_string;
       etcdPut(cmd, new_kv);
       counter++;
     }

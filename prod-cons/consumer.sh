@@ -26,7 +26,7 @@ spec:
    spec:
       containers:
       - name: ms-consumer
-        image: mostafa2020/prod-cons:v25
+        image: mostafa2020/prod-cons:v31
         command:
           - sh
           - -c
@@ -45,6 +45,15 @@ spec:
       - name: data-volume
         persistentVolumeClaim:
           claimName: cons-pvc
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - worker-1
 EOF
 }
 
